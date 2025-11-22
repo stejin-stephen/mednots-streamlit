@@ -5,10 +5,15 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import streamlit as st
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "")
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
-engine = create_engine(DATABASE_URL, pool_pre_ping=True) if DATABASE_URL else None
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+if DATABASE_URL:
+    engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+else:
+    engine = None
+    SessionLocal = None
+
 Base = declarative_base()
 
 class ClinicalNote(Base):
@@ -25,6 +30,8 @@ class ClinicalNote(Base):
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 def init_db():
+    if engine is None:
+        raise ValueError("Database not configured. DATABASE_URL environment variable is required.")
     Base.metadata.create_all(bind=engine)
 
 def get_db():
@@ -39,6 +46,8 @@ def get_cached_engine():
     return engine
 
 def save_clinical_note(original_note: str, result: dict, specialty: str = "General"):
+    if SessionLocal is None:
+        raise ValueError("Database not configured")
     db = SessionLocal()
     try:
         note = ClinicalNote(
@@ -57,6 +66,8 @@ def save_clinical_note(original_note: str, result: dict, specialty: str = "Gener
         db.close()
 
 def get_all_notes(limit: int = 100):
+    if SessionLocal is None:
+        return []
     db = SessionLocal()
     try:
         notes = db.query(ClinicalNote).order_by(ClinicalNote.created_at.desc()).limit(limit).all()
@@ -65,6 +76,8 @@ def get_all_notes(limit: int = 100):
         db.close()
 
 def search_notes(query: str):
+    if SessionLocal is None:
+        return []
     db = SessionLocal()
     try:
         notes = db.query(ClinicalNote).filter(
@@ -75,6 +88,8 @@ def search_notes(query: str):
         db.close()
 
 def filter_notes_by_specialty(specialty: str):
+    if SessionLocal is None:
+        return []
     db = SessionLocal()
     try:
         notes = db.query(ClinicalNote).filter(
@@ -85,6 +100,8 @@ def filter_notes_by_specialty(specialty: str):
         db.close()
 
 def get_note_by_id(note_id: int):
+    if SessionLocal is None:
+        return None
     db = SessionLocal()
     try:
         note = db.query(ClinicalNote).filter(ClinicalNote.id == note_id).first()
@@ -93,6 +110,8 @@ def get_note_by_id(note_id: int):
         db.close()
 
 def delete_note(note_id: int):
+    if SessionLocal is None:
+        return False
     db = SessionLocal()
     try:
         note = db.query(ClinicalNote).filter(ClinicalNote.id == note_id).first()

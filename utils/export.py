@@ -1,7 +1,7 @@
 from datetime import datetime
 from io import BytesIO
 from docx import Document
-from docx.shared import Pt, Inches
+from docx.shared import Pt, Inches, RGBColor
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
@@ -91,7 +91,7 @@ def export_to_word(soap_data: dict, vitals_data: dict, findings_data: dict, key_
     doc = Document()
     
     title = doc.add_heading('Medical Note Summary', 0)
-    title.runs[0].font.color.rgb = (31, 119, 180)
+    title.runs[0].font.color.rgb = RGBColor(31, 119, 180)
     
     doc.add_paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     
@@ -188,7 +188,10 @@ def export_to_fhir(soap_data: dict, vitals_data: dict, findings_data: dict, key_
                 "display": "Consult note"
             }]
         },
+        subject={"reference": "Patient/example", "display": "Example Patient"},
+        encounter={"reference": "Encounter/example"},
         date=datetime.now().isoformat(),
+        author=[{"reference": "Practitioner/example", "display": "AI Medical Note Summarizer"}],
         title="Clinical Note Summary",
         section=composition_sections
     )
