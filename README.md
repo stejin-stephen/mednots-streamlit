@@ -28,30 +28,6 @@ View, search, and manage all saved clinical notes with filtering by specialty.
 ### Bulk Processing
 Process multiple clinical notes at once with progress tracking.
 
-## Quick Start
-
-For complete beginners, here's the fastest way to get started:
-
-```bash
-# 1. Download the project (see "Get the Code" section below)
-# 2. Navigate to the project folder
-cd medical-note-summarizer
-
-# 3. Install Python dependencies
-pip install streamlit openai sqlalchemy psycopg2-binary reportlab python-docx fhir-resources
-
-# 4. Copy the environment template and add your API keys
-cp .env.example .env
-# Edit .env and add your OpenAI API key and database URL
-
-# 5. Run the application
-streamlit run app.py --server.port 5000
-
-# 6. Open your browser to http://localhost:5000
-```
-
-**That's it!** You should see the Medical Note Summarizer running locally.
-
 ## Tech Stack
 
 - **Frontend**: Streamlit (Python web framework)
@@ -114,7 +90,17 @@ pip install .
 Or install packages individually:
 
 ```bash
-pip install streamlit>=1.51.0 openai>=2.8.1 sqlalchemy>=2.0.44 psycopg2-binary>=2.9.11 reportlab>=4.4.5 python-docx>=1.2.0 fhir-resources>=8.1.0
+pip install \
+  streamlit>=1.51.0 \
+  openai>=2.8.1 \
+  sqlalchemy>=2.0.44 \
+  psycopg2-binary>=2.9.11 \
+  reportlab>=4.4.5 \
+  python-docx>=1.2.0 \
+  fhir-resources>=8.1.0 \
+  audio-recorder-streamlit>=0.0.10 \
+  pillow>=12.0.0 \
+  pymupdf>=1.26.6
 ```
 
 #### Option B: Using uv (faster, modern alternative)
