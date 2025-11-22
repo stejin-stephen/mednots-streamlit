@@ -139,13 +139,13 @@ Preferred communication style: Simple, everyday language.
 ✅ PDF export functionality
 ✅ Word (DOCX) export functionality
 ✅ HL7 FHIR JSON export functionality
-✅ EMR JSON format viewing and download (presenting complaint, diagnosis, vitals, plan)
+✅ EMR JSON format viewing and download with automatic ICD-10 code lookup (71,705 codes)
 ✅ Medical terminology validation UI (settings interface)
 ✅ Audio transcription via OpenAI Whisper (in-app recording + file upload)
 ✅ Lab report OCR via OpenAI Vision (PDF, JPG, PNG support)
 
 ### Technical Debt & Future Enhancements
-- Medical terminology validation backend (ICD-10, SNOMED CT, LOINC integration)
+- Enhanced medical terminology validation with SNOMED CT and LOINC integration
 - Custom template creation and management
 - User authentication and multi-user support
 - Advanced analytics on saved notes

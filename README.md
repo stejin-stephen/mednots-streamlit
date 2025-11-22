@@ -8,6 +8,7 @@ A comprehensive medical documentation application that transforms unstructured c
 
 - **🎤 Audio Transcription**: Record audio in-app or upload audio files and automatically transcribe them to text using OpenAI Whisper
 - **📄 Lab Report OCR**: Upload lab reports and medical documents (PDF, JPG, PNG) and extract text using AI-powered OCR via OpenAI Vision
+- **🔍 ICD-10 Code Lookup**: Automatic diagnosis code assignment from 71,705+ ICD-10 codes with fuzzy matching
 - **AI-Powered Summarization**: Transform free-text clinical notes into structured SOAP format using OpenAI GPT-5
 - **Automated Extraction**: Automatically extract vital signs, physical examination findings, and clinical assessments
 - **Note History**: Save and search through all processed notes with PostgreSQL database persistence
@@ -263,7 +264,7 @@ After generating a summary, you can view and download the structured EMR JSON fo
    - **subjective**: Patient-reported symptoms
    - **vital_signs**: All extracted vitals (BP, HR, temp, RR, SpO2)
    - **physical_examination**: Exam findings
-   - **diagnosis**: Diagnosis with ICD codes (pending integration)
+   - **diagnosis**: Diagnosis with automatic ICD-10 code lookup
    - **plan**: Treatment plan
    - **assessment_notes**: Clinical assessment
    - **symptom_duration**: Duration of symptoms
@@ -286,7 +287,7 @@ After generating a summary, you can view and download the structured EMR JSON fo
     "oxygen_saturation": "96%"
   },
   "diagnosis": [
-    { "code": "Pending", "text": "Acute inferior wall myocardial infarction" }
+    { "code": "I2119", "text": "Acute inferior wall myocardial infarction" }
   ],
   "plan": "Activate cath lab, Aspirin 325mg, Plavix 600mg..."
 }

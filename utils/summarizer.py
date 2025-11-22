@@ -1,6 +1,7 @@
 import json
 import re
 from utils.openai_client import get_openai_client
+from utils.icd10_lookup import find_icd10_code
 
 def extract_medical_summary(clinical_note: str) -> dict:
     client = get_openai_client()
@@ -152,17 +153,24 @@ def generate_emr_json(summary_data: dict) -> dict:
     assessment_text = soap.get("assessment", "")
     diagnosis_list = []
     
-    # Simple extraction - in production, this would use ICD-10 coding API
+    # Extract diagnoses and lookup ICD-10 codes
     if assessment_text and assessment_text != "N/A":
         # Split by common delimiters
         diagnoses = re.split(r'[;\n]', assessment_text)
         for diag in diagnoses:
             diag = diag.strip()
             if diag:
-                diagnosis_list.append({
-                    "code": "Pending",  # Would be ICD-10 code in production
-                    "text": diag
-                })
+                # Try to find matching ICD-10 code
+                icd_match = find_icd10_code(diag)
+                
+                if icd_match:
+                    diagnosis_list.append(icd_match)
+                else:
+                    # No match found, use "Pending"
+                    diagnosis_list.append({
+                        "code": "Pending",
+                        "text": diag
+                    })
     
     emr_json = {
         "presenting_complaint": key_info.get("chief_complaint", "Not specified"),
