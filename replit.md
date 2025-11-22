@@ -7,6 +7,7 @@ A comprehensive medical documentation application that transforms unstructured c
 ## Recent Changes (November 2025)
 
 ### Enhanced Features
+- **Audio Transcription**: Upload audio clinical notes and automatically transcribe using OpenAI Whisper (November 22, 2025)
 - **Multi-page Navigation**: Added sidebar navigation with dedicated pages for Summarize, Note History, Bulk Processing, and Settings
 - **Database Integration**: PostgreSQL database for persistent note storage with search and filtering capabilities
 - **Bulk Processing**: Upload and process multiple clinical notes simultaneously with progress tracking

@@ -6,6 +6,7 @@ A comprehensive medical documentation application that transforms unstructured c
 
 ## Features
 
+- **🎤 Audio Transcription**: Upload audio notes and automatically transcribe them to text using OpenAI Whisper
 - **AI-Powered Summarization**: Transform free-text clinical notes into structured SOAP format using OpenAI GPT-5
 - **Automated Extraction**: Automatically extract vital signs, physical examination findings, and clinical assessments
 - **Note History**: Save and search through all processed notes with PostgreSQL database persistence
@@ -52,7 +53,9 @@ streamlit run app.py --server.port 5000
 ## Tech Stack
 
 - **Frontend**: Streamlit (Python web framework)
-- **AI Engine**: OpenAI GPT-5 for medical text extraction
+- **AI Services**: 
+  - OpenAI GPT-5 for medical text extraction and SOAP formatting
+  - OpenAI Whisper for audio-to-text transcription
 - **Database**: PostgreSQL (Neon-backed) with SQLAlchemy ORM
 - **Document Generation**: ReportLab (PDF), python-docx (Word), fhir.resources (HL7 FHIR)
 
@@ -209,12 +212,21 @@ medical-note-summarizer/
 
 ### 1. Summarize a Clinical Note
 
+#### Option A: Text Input
 1. Navigate to **Summarize Note** from the sidebar
 2. Choose an example template or enter your own clinical note
 3. Select a specialty (General, Cardiology, Pediatrics, etc.)
 4. Click **Generate Summary**
 5. Review the structured SOAP note, vitals, and exam findings
 6. Click **Save to History** to store the note in the database
+
+#### Option B: Audio Upload (New!)
+1. Navigate to **Summarize Note** from the sidebar
+2. Upload an audio file (MP3, WAV, M4A, etc.) containing a clinical note
+3. Click **Transcribe Audio** to convert speech to text using Whisper AI
+4. Review and edit the transcribed text if needed
+5. Select a specialty and click **Generate Summary**
+6. Review the structured SOAP note and save to history
 
 ### 2. View Note History
 
@@ -304,8 +316,10 @@ CMD ["streamlit", "run", "app.py", "--server.port=5000", "--server.address=0.0.0
 1. Sign up at [OpenAI Platform](https://platform.openai.com/)
 2. Navigate to API Keys section
 3. Create a new API key
-4. Add billing information (GPT-5 requires a paid account)
+4. Add billing information (GPT-5 and Whisper require a paid account)
 5. Store the key securely in your environment variables
+
+**Note**: The same API key works for both GPT-5 (text summarization) and Whisper (audio transcription).
 
 ## Development
 
@@ -340,11 +354,20 @@ If you see "Database not available" errors:
 
 ### OpenAI API Errors
 
-If summarization fails:
+If summarization or transcription fails:
 1. Verify your API key is valid and active
 2. Check you have sufficient credits in your OpenAI account
-3. Ensure you have access to GPT-5 (or change model in `utils/openai_client.py`)
+3. Ensure you have access to GPT-5 and Whisper models
 4. Check network connectivity to OpenAI API
+5. For audio files, ensure they are under 25 MB and in a supported format
+
+### Audio Transcription Issues
+
+If audio upload doesn't work:
+1. Ensure the audio file is in a supported format (MP3, WAV, M4A, etc.)
+2. Check the file size is under 25 MB (Whisper API limit)
+3. Verify your OpenAI API key has access to the Whisper model
+4. Try converting the audio to MP3 if using an uncommon format
 
 ### Streamlit Port Already in Use
 
