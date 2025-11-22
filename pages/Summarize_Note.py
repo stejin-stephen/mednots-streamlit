@@ -2,7 +2,7 @@ import streamlit as st
 from utils.summarizer import extract_medical_summary, format_soap_note, format_vitals, format_exam_findings
 from utils.database import save_clinical_note, init_db
 from utils.export import export_to_pdf, export_to_word, export_to_fhir
-from utils.openai_client import transcribe_audio
+from utils.openai_client import transcribe_audio, process_lab_report
 from datetime import datetime
 import io
 from audio_recorder_streamlit import audio_recorder
@@ -119,17 +119,17 @@ with col1:
             list(SPECIALTY_TEMPLATES.keys())
         )
     
-    # Audio section with tabs for recording and uploading
+    # Multi-modal input section with tabs for different input types
     st.markdown("---")
-    st.markdown("**🎤 Audio Note Input (Optional)**")
-    st.caption("Record audio in-app or upload a file to automatically transcribe using Whisper AI")
+    st.markdown("**📥 Multi-Modal Input (Optional)**")
+    st.caption("Record audio, upload audio files, or upload lab reports (PDF/images)")
     
     # Initialize transcription state
     if 'transcribed_text' not in st.session_state:
         st.session_state['transcribed_text'] = ""
     
-    # Create tabs for recording vs uploading
-    audio_tab1, audio_tab2 = st.tabs(["🎙️ Record Audio", "📁 Upload Audio File"])
+    # Create tabs for different input types
+    audio_tab1, audio_tab2, doc_tab = st.tabs(["🎙️ Record Audio", "📁 Upload Audio", "📄 Upload Lab Report"])
     
     with audio_tab1:
         st.caption("Click the microphone to start/stop recording")
@@ -188,6 +188,46 @@ with col1:
                     else:
                         st.error(f"❌ Transcription failed: {result.get('error', 'Unknown error')}")
     
+    with doc_tab:
+        st.caption("Upload lab reports, test results, or medical documents as PDF or images")
+        lab_report_file = st.file_uploader(
+            "Choose a lab report",
+            type=["pdf", "jpg", "jpeg", "png"],
+            help="Supported formats: PDF, JPG, PNG (max 5 pages for PDFs)",
+            label_visibility="collapsed",
+            key="lab_report_uploader"
+        )
+        
+        # Process lab report if uploaded
+        if lab_report_file is not None:
+            # Show preview for images
+            if lab_report_file.type.startswith('image/'):
+                st.image(lab_report_file, caption="Preview", use_container_width=True)
+            else:
+                st.info(f"📄 {lab_report_file.name} ({lab_report_file.size / 1024:.1f} KB)")
+            
+            if st.button("🔍 Extract Text (OCR)", type="secondary", use_container_width=True, key="extract_lab_report"):
+                with st.spinner("Extracting text from document using AI OCR..."):
+                    # Read file bytes
+                    file_bytes = lab_report_file.read()
+                    
+                    # Process with OCR
+                    result = process_lab_report(file_bytes, lab_report_file.name)
+                    
+                    if result.get("success"):
+                        # Update the clinical note input session state so it appears in the text area
+                        st.session_state['clinical_note_input'] = result["text"]
+                        st.session_state['transcribed_text'] = result["text"]
+                        
+                        # Show pages processed for PDFs
+                        if 'pages_processed' in result:
+                            st.success(f"✅ Text extracted successfully from {result['pages_processed']} page(s)! Review below.")
+                        else:
+                            st.success("✅ Text extracted successfully! Review below.")
+                        st.rerun()
+                    else:
+                        st.error(f"❌ Text extraction failed: {result.get('error', 'Unknown error')}")
+    
     st.markdown("---")
     
     # Initialize the clinical note input key if not present
@@ -204,7 +244,7 @@ with col1:
     clinical_note = st.text_area(
         "Enter or review clinical note:",
         height=400,
-        placeholder="Enter unstructured clinical notes here...\n\nOr upload an audio file above to transcribe automatically.\n\nExample:\n65-year-old male with chest pain for 2 days...",
+        placeholder="Enter unstructured clinical notes here...\n\nOr use the tabs above to:\n• Record audio\n• Upload audio file\n• Upload lab report (PDF/image) for OCR\n\nExample:\n65-year-old male with chest pain for 2 days...",
         key="clinical_note_input"
     )
     
