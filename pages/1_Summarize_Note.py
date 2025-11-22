@@ -1,11 +1,14 @@
 import streamlit as st
-from utils.summarizer import extract_medical_summary, format_soap_note, format_vitals, format_exam_findings
+from utils.summarizer import extract_medical_summary, format_soap_note, format_vitals, format_exam_findings, generate_emr_json
 from utils.database import save_clinical_note, init_db
 from utils.export import export_to_pdf, export_to_word, export_to_fhir
 from utils.openai_client import transcribe_audio, process_lab_report
 from datetime import datetime
 import io
+import json
 from audio_recorder_streamlit import audio_recorder
+import fitz
+from PIL import Image
 
 st.set_page_config(page_title="Summarize Note", page_icon="📝", layout="wide")
 
@@ -283,7 +286,7 @@ with col2:
     if 'last_result' in st.session_state:
         result = st.session_state['last_result']
         
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(["📄 SOAP Note", "💉 Vitals", "🔍 Exam Findings", "ℹ️ Key Info", "📤 Export"])
+        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["📄 SOAP Note", "💉 Vitals", "🔍 Exam Findings", "ℹ️ Key Info", "📊 EMR JSON", "📤 Export"])
         
         with tab1:
             soap_formatted = format_soap_note(result)
@@ -308,6 +311,29 @@ with col2:
                 st.info("No key information extracted")
         
         with tab5:
+            st.markdown("### EMR JSON Format")
+            st.caption("Structured electronic medical record data in JSON format")
+            
+            emr_json = generate_emr_json(result)
+            
+            if "error" not in emr_json:
+                # Display formatted JSON
+                emr_json_str = json.dumps(emr_json, indent=2)
+                st.code(emr_json_str, language="json")
+                
+                # Download button
+                st.download_button(
+                    label="📥 Download EMR JSON",
+                    data=emr_json_str,
+                    file_name=f"emr_note_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+                    mime="application/json",
+                    use_container_width=True,
+                    type="primary"
+                )
+            else:
+                st.error(f"Error generating EMR JSON: {emr_json.get('error')}")
+        
+        with tab6:
             st.markdown("### Export Options")
             
             col_exp1, col_exp2, col_exp3 = st.columns(3)

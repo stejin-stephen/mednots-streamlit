@@ -127,3 +127,63 @@ def format_exam_findings(exam_data: dict) -> str:
         output.append(f"{i}. {finding}")
     
     return "\n".join(output)
+
+def generate_emr_json(summary_data: dict) -> dict:
+    """
+    Generate EMR-compatible JSON format from summarized clinical data.
+    
+    Args:
+        summary_data: The structured medical summary from extract_medical_summary
+    
+    Returns:
+        Dictionary in EMR JSON format
+    """
+    if not summary_data or "error" in summary_data:
+        return {
+            "error": "Invalid or incomplete summary data"
+        }
+    
+    soap = summary_data.get("soap_note", {})
+    vitals = summary_data.get("key_vitals", {})
+    findings = summary_data.get("exam_findings", [])
+    key_info = summary_data.get("key_information", {})
+    
+    # Extract diagnosis information from assessment
+    assessment_text = soap.get("assessment", "")
+    diagnosis_list = []
+    
+    # Simple extraction - in production, this would use ICD-10 coding API
+    if assessment_text and assessment_text != "N/A":
+        # Split by common delimiters
+        diagnoses = re.split(r'[;\n]', assessment_text)
+        for diag in diagnoses:
+            diag = diag.strip()
+            if diag:
+                diagnosis_list.append({
+                    "code": "Pending",  # Would be ICD-10 code in production
+                    "text": diag
+                })
+    
+    emr_json = {
+        "presenting_complaint": key_info.get("chief_complaint", "Not specified"),
+        "patient_demographics": {
+            "age": key_info.get("age", "Not specified"),
+            "gender": key_info.get("gender", "Not specified")
+        },
+        "subjective": soap.get("subjective", "N/A"),
+        "vital_signs": {
+            "blood_pressure": vitals.get("blood_pressure", "N/A"),
+            "heart_rate": vitals.get("heart_rate", "N/A"),
+            "temperature": vitals.get("temperature", "N/A"),
+            "respiratory_rate": vitals.get("respiratory_rate", "N/A"),
+            "oxygen_saturation": vitals.get("oxygen_saturation", "N/A"),
+            "other": vitals.get("other", "N/A")
+        },
+        "physical_examination": findings if findings else ["No findings recorded"],
+        "diagnosis": diagnosis_list if diagnosis_list else [{"code": "Pending", "text": assessment_text or "Not specified"}],
+        "plan": soap.get("plan", "N/A"),
+        "assessment_notes": soap.get("assessment", "N/A"),
+        "symptom_duration": key_info.get("duration", "Not specified")
+    }
+    
+    return emr_json

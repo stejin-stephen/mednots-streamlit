@@ -12,7 +12,7 @@ A comprehensive medical documentation application that transforms unstructured c
 - **Automated Extraction**: Automatically extract vital signs, physical examination findings, and clinical assessments
 - **Note History**: Save and search through all processed notes with PostgreSQL database persistence
 - **Bulk Processing**: Upload and process multiple clinical notes simultaneously
-- **Multi-Format Exports**: Export notes to PDF, Word (DOCX), and HL7 FHIR JSON formats
+- **Multi-Format Exports**: Export notes to PDF, Word (DOCX), HL7 FHIR JSON, and EMR JSON formats
 - **Specialty Templates**: Support for specialty-specific output templates (Cardiology, Pediatrics, Internal Medicine, Emergency Medicine)
 - **Medical Terminology**: UI for configuring validation and standardization options
 
@@ -251,6 +251,46 @@ You can provide clinical information in multiple ways:
 5. Click **Extract Text (OCR)** to extract text using AI-powered OCR
 6. Review and edit the extracted text if needed
 7. Select a specialty and click **Generate Summary**
+
+#### Option C: View and Download EMR JSON (New!)
+
+After generating a summary, you can view and download the structured EMR JSON format:
+
+1. Navigate to the **📊 EMR JSON** tab in the structured output section
+2. Review the JSON structure containing:
+   - **presenting_complaint**: Chief complaint/reason for visit
+   - **patient_demographics**: Age and gender
+   - **subjective**: Patient-reported symptoms
+   - **vital_signs**: All extracted vitals (BP, HR, temp, RR, SpO2)
+   - **physical_examination**: Exam findings
+   - **diagnosis**: Diagnosis with ICD codes (pending integration)
+   - **plan**: Treatment plan
+   - **assessment_notes**: Clinical assessment
+   - **symptom_duration**: Duration of symptoms
+3. Click **📥 Download EMR JSON** to save the file
+4. Use the JSON in your EMR/EHR systems or for further processing
+
+**Sample EMR JSON:**
+```json
+{
+  "presenting_complaint": "chest pain",
+  "patient_demographics": {
+    "age": "65",
+    "gender": "male"
+  },
+  "vital_signs": {
+    "blood_pressure": "145/92 mmHg",
+    "heart_rate": "88 bpm",
+    "temperature": "98.4°F",
+    "respiratory_rate": "18 breaths/min",
+    "oxygen_saturation": "96%"
+  },
+  "diagnosis": [
+    { "code": "Pending", "text": "Acute inferior wall myocardial infarction" }
+  ],
+  "plan": "Activate cath lab, Aspirin 325mg, Plavix 600mg..."
+}
+```
 
 ### 2. View Note History
 

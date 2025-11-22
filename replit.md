@@ -7,6 +7,7 @@ A comprehensive medical documentation application that transforms unstructured c
 ## Recent Changes (November 2025)
 
 ### Enhanced Features
+- **EMR JSON Export**: View and download structured EMR JSON format with presenting complaint, diagnosis codes, vitals, exam findings, and treatment plan (November 22, 2025)
 - **Lab Report OCR**: Upload lab reports and medical documents (PDF, JPG, PNG) with AI-powered text extraction using OpenAI Vision API (November 22, 2025)
 - **Audio Transcription**: Record audio in-app or upload audio files, automatically transcribe using OpenAI Whisper with in-browser recording capability (November 22, 2025)
 - **Multi-page Navigation**: Added sidebar navigation with dedicated pages for Summarize, Note History, Bulk Processing, and Settings
@@ -138,6 +139,7 @@ Preferred communication style: Simple, everyday language.
 ✅ PDF export functionality
 ✅ Word (DOCX) export functionality
 ✅ HL7 FHIR JSON export functionality
+✅ EMR JSON format viewing and download (presenting complaint, diagnosis, vitals, plan)
 ✅ Medical terminology validation UI (settings interface)
 ✅ Audio transcription via OpenAI Whisper (in-app recording + file upload)
 ✅ Lab report OCR via OpenAI Vision (PDF, JPG, PNG support)
