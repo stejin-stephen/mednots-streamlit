@@ -2,7 +2,9 @@ import streamlit as st
 from utils.summarizer import extract_medical_summary, format_soap_note, format_vitals, format_exam_findings
 from utils.database import save_clinical_note, init_db
 from utils.export import export_to_pdf, export_to_word, export_to_fhir
+from utils.openai_client import transcribe_audio
 from datetime import datetime
+import io
 
 st.set_page_config(page_title="Summarize Note", page_icon="📝", layout="wide")
 
@@ -116,16 +118,54 @@ with col1:
             list(SPECIALTY_TEMPLATES.keys())
         )
     
+    # Audio upload section
+    st.markdown("---")
+    st.markdown("**🎤 Upload Audio Note (Optional)**")
+    st.caption("Upload an audio recording to automatically transcribe using Whisper AI")
+    
+    audio_file = st.file_uploader(
+        "Choose an audio file",
+        type=["mp3", "mp4", "mpeg", "mpga", "m4a", "wav", "webm"],
+        help="Supported formats: MP3, MP4, MPEG, M4A, WAV, WebM (max 25 MB)",
+        label_visibility="collapsed"
+    )
+    
+    # Initialize transcription state
+    if 'transcribed_text' not in st.session_state:
+        st.session_state['transcribed_text'] = ""
+    
+    # Transcribe audio if uploaded
+    if audio_file is not None:
+        if st.button("🎧 Transcribe Audio", type="secondary", use_container_width=True):
+            with st.spinner("Transcribing audio with Whisper AI..."):
+                # Create a BytesIO object from the uploaded file
+                audio_bytes = io.BytesIO(audio_file.read())
+                
+                # Transcribe
+                result = transcribe_audio(audio_bytes, audio_file.name)
+                
+                if result.get("success"):
+                    st.session_state['transcribed_text'] = result["text"]
+                    st.success("✅ Audio transcribed successfully!")
+                else:
+                    st.error(f"❌ Transcription failed: {result.get('error', 'Unknown error')}")
+    
+    st.markdown("---")
+    
+    # Determine the text to display
     if example_choice != "Custom Note":
         default_text = EXAMPLE_NOTES[example_choice]
+    elif st.session_state['transcribed_text']:
+        default_text = st.session_state['transcribed_text']
     else:
         default_text = ""
     
     clinical_note = st.text_area(
-        "Enter clinical note:",
+        "Enter or review clinical note:",
         value=default_text,
         height=400,
-        placeholder="Enter unstructured clinical notes here...\n\nExample:\n65-year-old male with chest pain for 2 days..."
+        placeholder="Enter unstructured clinical notes here...\n\nOr upload an audio file above to transcribe automatically.\n\nExample:\n65-year-old male with chest pain for 2 days...",
+        key="clinical_note_input"
     )
     
     col_btn1, col_btn2 = st.columns(2)
