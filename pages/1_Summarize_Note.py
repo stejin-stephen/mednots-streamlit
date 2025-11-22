@@ -98,7 +98,31 @@ SPECIALTY_TEMPLATES = {
     "Cardiology": "Cardiology-focused template with detailed cardiac assessment",
     "Pediatrics": "Pediatric template with growth and development tracking",
     "Internal Medicine": "Comprehensive internal medicine assessment",
-    "Emergency Medicine": "Emergency department note format"
+    "Emergency Medicine": "Emergency department note format",
+    "Psychiatry": "Psychiatric evaluation with mental status exam",
+    "Neurology": "Neurological assessment with detailed neuro exam",
+    "Orthopedics": "Musculoskeletal and orthopedic evaluation",
+    "Dermatology": "Skin and dermatological assessment",
+    "Gastroenterology": "GI-focused evaluation with digestive system assessment",
+    "Pulmonology": "Respiratory and pulmonary medicine assessment",
+    "Nephrology": "Renal and kidney disease evaluation",
+    "Endocrinology": "Endocrine and metabolic disorder assessment",
+    "Hematology/Oncology": "Blood disorders and cancer evaluation",
+    "Infectious Disease": "Infectious disease evaluation and management",
+    "Rheumatology": "Autoimmune and rheumatologic assessment",
+    "Obstetrics/Gynecology": "Women's health and OB/GYN evaluation",
+    "Urology": "Urological and genitourinary assessment",
+    "Ophthalmology": "Eye and vision evaluation",
+    "ENT": "Ear, nose, and throat assessment",
+    "Allergy/Immunology": "Allergy and immunological evaluation",
+    "Family Medicine": "Comprehensive family practice assessment",
+    "Geriatrics": "Geriatric medicine with age-specific considerations",
+    "Sports Medicine": "Athletic injury and performance evaluation",
+    "Pain Management": "Chronic pain assessment and management",
+    "Critical Care": "ICU and critical care medicine notes",
+    "Anesthesiology": "Pre-operative and anesthesia assessment",
+    "Radiology": "Imaging interpretation and findings",
+    "Pathology": "Laboratory and pathology findings"
 }
 
 st.title("🏥 Medical Note Summarization")

@@ -14,7 +14,7 @@ A comprehensive medical documentation application that transforms unstructured c
 - **Database Integration**: PostgreSQL database for persistent note storage with search and filtering capabilities
 - **Bulk Processing**: Upload and process multiple clinical notes simultaneously with progress tracking
 - **Export Functionality**: Export notes to PDF, Word (DOCX), and HL7 FHIR JSON formats
-- **Specialty Templates**: Support for specialty-specific output templates (Cardiology, Pediatrics, Internal Medicine, Emergency Medicine)
+- **Specialty Templates**: Support for 29+ specialty-specific templates (Cardiology, Pediatrics, Psychiatry, Neurology, Orthopedics, Dermatology, GI, Pulmonology, and more)
 - **Medical Terminology Settings**: UI for configuring validation and standardization options (foundational UI implemented)
 
 ## User Preferences
@@ -135,7 +135,7 @@ Preferred communication style: Simple, everyday language.
 ✅ Note history with database persistence
 ✅ Search and filter capabilities for saved notes
 ✅ Bulk note processing with file upload
-✅ Specialty-specific templates (Cardiology, Pediatrics, Internal Medicine, etc.)
+✅ 29+ specialty-specific templates (Cardiology, Pediatrics, Psychiatry, Neurology, Orthopedics, Dermatology, and more)
 ✅ PDF export functionality
 ✅ Word (DOCX) export functionality
 ✅ HL7 FHIR JSON export functionality
