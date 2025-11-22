@@ -5,6 +5,7 @@ from utils.export import export_to_pdf, export_to_word, export_to_fhir
 from utils.openai_client import transcribe_audio
 from datetime import datetime
 import io
+from audio_recorder_streamlit import audio_recorder
 
 st.set_page_config(page_title="Summarize Note", page_icon="📝", layout="wide")
 
@@ -118,40 +119,74 @@ with col1:
             list(SPECIALTY_TEMPLATES.keys())
         )
     
-    # Audio upload section
+    # Audio section with tabs for recording and uploading
     st.markdown("---")
-    st.markdown("**🎤 Upload Audio Note (Optional)**")
-    st.caption("Upload an audio recording to automatically transcribe using Whisper AI")
-    
-    audio_file = st.file_uploader(
-        "Choose an audio file",
-        type=["mp3", "mp4", "mpeg", "mpga", "m4a", "wav", "webm"],
-        help="Supported formats: MP3, MP4, MPEG, M4A, WAV, WebM (max 25 MB)",
-        label_visibility="collapsed"
-    )
+    st.markdown("**🎤 Audio Note Input (Optional)**")
+    st.caption("Record audio in-app or upload a file to automatically transcribe using Whisper AI")
     
     # Initialize transcription state
     if 'transcribed_text' not in st.session_state:
         st.session_state['transcribed_text'] = ""
     
-    # Transcribe audio if uploaded
-    if audio_file is not None:
-        if st.button("🎧 Transcribe Audio", type="secondary", use_container_width=True):
-            with st.spinner("Transcribing audio with Whisper AI..."):
-                # Create a BytesIO object from the uploaded file
-                audio_bytes = io.BytesIO(audio_file.read())
-                
-                # Transcribe
-                result = transcribe_audio(audio_bytes, audio_file.name)
-                
-                if result.get("success"):
-                    # Update the clinical note input session state so it appears in the text area
-                    st.session_state['clinical_note_input'] = result["text"]
-                    st.session_state['transcribed_text'] = result["text"]
-                    st.success("✅ Audio transcribed successfully! Review the text below.")
-                    st.rerun()
-                else:
-                    st.error(f"❌ Transcription failed: {result.get('error', 'Unknown error')}")
+    # Create tabs for recording vs uploading
+    audio_tab1, audio_tab2 = st.tabs(["🎙️ Record Audio", "📁 Upload Audio File"])
+    
+    with audio_tab1:
+        st.caption("Click the microphone to start/stop recording")
+        audio_bytes = audio_recorder(
+            text="Click to record",
+            recording_color="#e74c3c",
+            neutral_color="#3498db",
+            icon_name="microphone",
+            icon_size="3x",
+        )
+        
+        if audio_bytes:
+            st.audio(audio_bytes, format="audio/wav")
+            
+            if st.button("🎧 Transcribe Recording", type="secondary", use_container_width=True, key="transcribe_recording"):
+                with st.spinner("Transcribing your recording with Whisper AI..."):
+                    # Convert to BytesIO for API
+                    audio_io = io.BytesIO(audio_bytes)
+                    
+                    # Transcribe
+                    result = transcribe_audio(audio_io, "recording.wav")
+                    
+                    if result.get("success"):
+                        # Update the clinical note input session state so it appears in the text area
+                        st.session_state['clinical_note_input'] = result["text"]
+                        st.session_state['transcribed_text'] = result["text"]
+                        st.success("✅ Recording transcribed successfully! Review the text below.")
+                        st.rerun()
+                    else:
+                        st.error(f"❌ Transcription failed: {result.get('error', 'Unknown error')}")
+    
+    with audio_tab2:
+        audio_file = st.file_uploader(
+            "Choose an audio file",
+            type=["mp3", "mp4", "mpeg", "mpga", "m4a", "wav", "webm"],
+            help="Supported formats: MP3, MP4, MPEG, M4A, WAV, WebM (max 25 MB)",
+            label_visibility="collapsed"
+        )
+        
+        # Transcribe audio if uploaded
+        if audio_file is not None:
+            if st.button("🎧 Transcribe Upload", type="secondary", use_container_width=True, key="transcribe_upload"):
+                with st.spinner("Transcribing audio with Whisper AI..."):
+                    # Create a BytesIO object from the uploaded file
+                    audio_bytes_upload = io.BytesIO(audio_file.read())
+                    
+                    # Transcribe
+                    result = transcribe_audio(audio_bytes_upload, audio_file.name)
+                    
+                    if result.get("success"):
+                        # Update the clinical note input session state so it appears in the text area
+                        st.session_state['clinical_note_input'] = result["text"]
+                        st.session_state['transcribed_text'] = result["text"]
+                        st.success("✅ Audio transcribed successfully! Review the text below.")
+                        st.rerun()
+                    else:
+                        st.error(f"❌ Transcription failed: {result.get('error', 'Unknown error')}")
     
     st.markdown("---")
     
