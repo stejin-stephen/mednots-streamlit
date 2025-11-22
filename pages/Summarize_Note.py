@@ -145,24 +145,29 @@ with col1:
                 result = transcribe_audio(audio_bytes, audio_file.name)
                 
                 if result.get("success"):
+                    # Update the clinical note input session state so it appears in the text area
+                    st.session_state['clinical_note_input'] = result["text"]
                     st.session_state['transcribed_text'] = result["text"]
-                    st.success("✅ Audio transcribed successfully!")
+                    st.success("✅ Audio transcribed successfully! Review the text below.")
+                    st.rerun()
                 else:
                     st.error(f"❌ Transcription failed: {result.get('error', 'Unknown error')}")
     
     st.markdown("---")
     
-    # Determine the text to display
-    if example_choice != "Custom Note":
-        default_text = EXAMPLE_NOTES[example_choice]
-    elif st.session_state['transcribed_text']:
-        default_text = st.session_state['transcribed_text']
-    else:
-        default_text = ""
+    # Initialize the clinical note input key if not present
+    if 'clinical_note_input' not in st.session_state:
+        if example_choice != "Custom Note":
+            st.session_state['clinical_note_input'] = EXAMPLE_NOTES[example_choice]
+        else:
+            st.session_state['clinical_note_input'] = ""
+    
+    # Update clinical note input when example is selected (only if not already transcribed)
+    if example_choice != "Custom Note" and not st.session_state.get('transcribed_text'):
+        st.session_state['clinical_note_input'] = EXAMPLE_NOTES[example_choice]
     
     clinical_note = st.text_area(
         "Enter or review clinical note:",
-        value=default_text,
         height=400,
         placeholder="Enter unstructured clinical notes here...\n\nOr upload an audio file above to transcribe automatically.\n\nExample:\n65-year-old male with chest pain for 2 days...",
         key="clinical_note_input"
