@@ -85,7 +85,8 @@ def pdf_to_images(pdf_bytes: bytes, max_pages: int = 5) -> list:
             page = pdf_document[page_num]
             
             # Render page to image (higher resolution for better OCR)
-            pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+            mat = fitz.Matrix(2, 2)
+            pix = page.get_pixmap(matrix=mat)
             
             # Convert to bytes
             img_bytes = pix.tobytes("png")
@@ -97,13 +98,14 @@ def pdf_to_images(pdf_bytes: bytes, max_pages: int = 5) -> list:
     except Exception as e:
         raise Exception(f"Failed to convert PDF to images: {str(e)}")
 
-def extract_text_from_image(image_bytes: bytes, file_type: str = "image") -> dict:
+def extract_text_from_image(image_bytes: bytes, file_type: str = "image", mime_type: str = "image/png") -> dict:
     """
     Extract text from an image using OpenAI Vision API.
     
     Args:
         image_bytes: Image data as bytes
         file_type: Type of file (image or pdf) for context
+        mime_type: MIME type of the image (e.g., image/png, image/jpeg)
     
     Returns:
         dict with 'text' key containing extracted text or 'error' key if failed
@@ -125,7 +127,7 @@ Format the output as clear, readable text that can be used for medical documenta
 Include all relevant medical information, preserving structure and formatting.
 Format the output as clear, readable text."""
         
-        # Call Vision API
+        # Call Vision API with correct MIME type
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[
@@ -139,7 +141,7 @@ Format the output as clear, readable text."""
                         {
                             "type": "image_url",
                             "image_url": {
-                                "url": f"data:image/png;base64,{base64_image}"
+                                "url": f"data:{mime_type};base64,{base64_image}"
                             }
                         }
                     ]
@@ -175,13 +177,22 @@ def process_lab_report(file_bytes: bytes, filename: str) -> dict:
     try:
         file_ext = filename.lower().split('.')[-1]
         
+        # Determine MIME type from extension
+        mime_type_map = {
+            'jpg': 'image/jpeg',
+            'jpeg': 'image/jpeg',
+            'png': 'image/png',
+            'pdf': 'image/png'  # PDF pages are converted to PNG
+        }
+        
         if file_ext == 'pdf':
             # Convert PDF to images and extract text from each page
             images = pdf_to_images(file_bytes, max_pages=5)
             
             all_text = []
             for i, img_bytes in enumerate(images):
-                result = extract_text_from_image(img_bytes, file_type="pdf")
+                # PDFs are converted to PNG format
+                result = extract_text_from_image(img_bytes, file_type="pdf", mime_type="image/png")
                 if result.get("success"):
                     all_text.append(f"--- Page {i+1} ---\n{result['text']}")
                 else:
@@ -194,8 +205,9 @@ def process_lab_report(file_bytes: bytes, filename: str) -> dict:
             }
         
         elif file_ext in ['jpg', 'jpeg', 'png']:
-            # Process image directly
-            return extract_text_from_image(file_bytes, file_type="lab_report")
+            # Process image directly with correct MIME type
+            mime_type = mime_type_map.get(file_ext, 'image/png')
+            return extract_text_from_image(file_bytes, file_type="lab_report", mime_type=mime_type)
         
         else:
             return {
