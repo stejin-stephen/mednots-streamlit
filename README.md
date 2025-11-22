@@ -6,7 +6,7 @@ A comprehensive medical documentation application that transforms unstructured c
 
 ## Features
 
-- **🎤 Audio Transcription**: Upload audio notes and automatically transcribe them to text using OpenAI Whisper
+- **🎤 Audio Transcription**: Record audio in-app or upload audio files and automatically transcribe them to text using OpenAI Whisper
 - **AI-Powered Summarization**: Transform free-text clinical notes into structured SOAP format using OpenAI GPT-5
 - **Automated Extraction**: Automatically extract vital signs, physical examination findings, and clinical assessments
 - **Note History**: Save and search through all processed notes with PostgreSQL database persistence
@@ -220,13 +220,26 @@ medical-note-summarizer/
 5. Review the structured SOAP note, vitals, and exam findings
 6. Click **Save to History** to store the note in the database
 
-#### Option B: Audio Upload (New!)
+#### Option B: Audio Input (New!)
+
+You can provide audio notes in two ways:
+
+**Method 1: Record Audio In-App**
 1. Navigate to **Summarize Note** from the sidebar
-2. Upload an audio file (MP3, WAV, M4A, etc.) containing a clinical note
-3. Click **Transcribe Audio** to convert speech to text using Whisper AI
-4. Review and edit the transcribed text if needed
-5. Select a specialty and click **Generate Summary**
-6. Review the structured SOAP note and save to history
+2. Click the **Record Audio** tab
+3. Click the microphone button to start recording your clinical note
+4. Click again to stop recording
+5. Click **Transcribe Recording** to convert speech to text using Whisper AI
+6. Review and edit the transcribed text if needed
+7. Select a specialty and click **Generate Summary**
+
+**Method 2: Upload Audio File**
+1. Navigate to **Summarize Note** from the sidebar
+2. Click the **Upload Audio File** tab
+3. Upload a pre-recorded audio file (MP3, WAV, M4A, etc.)
+4. Click **Transcribe Upload** to convert speech to text using Whisper AI
+5. Review and edit the transcribed text if needed
+6. Select a specialty and click **Generate Summary**
 
 ### 2. View Note History
 
@@ -363,6 +376,14 @@ If summarization or transcription fails:
 
 ### Audio Transcription Issues
 
+**In-App Recording:**
+If browser recording doesn't work:
+1. Grant microphone permissions when prompted by your browser
+2. Ensure your device has a working microphone
+3. Try a different browser (Chrome, Firefox, Edge recommended)
+4. Check that no other application is blocking microphone access
+
+**File Upload:**
 If audio upload doesn't work:
 1. Ensure the audio file is in a supported format (MP3, WAV, M4A, etc.)
 2. Check the file size is under 25 MB (Whisper API limit)
