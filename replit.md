@@ -7,6 +7,7 @@ A comprehensive medical documentation application that transforms unstructured c
 ## Recent Changes (November 2025)
 
 ### Enhanced Features
+- **Lab Report OCR**: Upload lab reports and medical documents (PDF, JPG, PNG) with AI-powered text extraction using OpenAI Vision API (November 22, 2025)
 - **Audio Transcription**: Record audio in-app or upload audio files, automatically transcribe using OpenAI Whisper with in-browser recording capability (November 22, 2025)
 - **Multi-page Navigation**: Added sidebar navigation with dedicated pages for Summarize, Note History, Bulk Processing, and Settings
 - **Database Integration**: PostgreSQL database for persistent note storage with search and filtering capabilities
@@ -89,10 +90,12 @@ Preferred communication style: Simple, everyday language.
 ## External Dependencies
 
 ### AI Services
-- **OpenAI API (GPT-5 model)** - Core NLP engine for medical text extraction and structuring
+- **OpenAI API** - Multi-model AI services for medical text processing
+  - **GPT-5**: Core NLP engine for medical text extraction and SOAP formatting
+  - **Whisper**: Audio-to-text transcription for voice notes
+  - **GPT-4o Vision**: OCR and text extraction from lab reports and medical documents
   - Configured via `AI_INTEGRATIONS_OPENAI_API_KEY` environment variable
   - Supports custom base URL via `AI_INTEGRATIONS_OPENAI_BASE_URL`
-  - Used for transforming unstructured clinical notes into structured JSON format
   - Accessed through Replit AI Integrations (no personal API key required)
 
 ### Database
@@ -136,6 +139,8 @@ Preferred communication style: Simple, everyday language.
 ✅ Word (DOCX) export functionality
 ✅ HL7 FHIR JSON export functionality
 ✅ Medical terminology validation UI (settings interface)
+✅ Audio transcription via OpenAI Whisper (in-app recording + file upload)
+✅ Lab report OCR via OpenAI Vision (PDF, JPG, PNG support)
 
 ### Technical Debt & Future Enhancements
 - Medical terminology validation backend (ICD-10, SNOMED CT, LOINC integration)

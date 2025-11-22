@@ -7,6 +7,7 @@ A comprehensive medical documentation application that transforms unstructured c
 ## Features
 
 - **🎤 Audio Transcription**: Record audio in-app or upload audio files and automatically transcribe them to text using OpenAI Whisper
+- **📄 Lab Report OCR**: Upload lab reports and medical documents (PDF, JPG, PNG) and extract text using AI-powered OCR via OpenAI Vision
 - **AI-Powered Summarization**: Transform free-text clinical notes into structured SOAP format using OpenAI GPT-5
 - **Automated Extraction**: Automatically extract vital signs, physical examination findings, and clinical assessments
 - **Note History**: Save and search through all processed notes with PostgreSQL database persistence
@@ -56,6 +57,7 @@ streamlit run app.py --server.port 5000
 - **AI Services**: 
   - OpenAI GPT-5 for medical text extraction and SOAP formatting
   - OpenAI Whisper for audio-to-text transcription
+  - OpenAI Vision (GPT-4o) for OCR and document text extraction
 - **Database**: PostgreSQL (Neon-backed) with SQLAlchemy ORM
 - **Document Generation**: ReportLab (PDF), python-docx (Word), fhir.resources (HL7 FHIR)
 
@@ -220,9 +222,9 @@ medical-note-summarizer/
 5. Review the structured SOAP note, vitals, and exam findings
 6. Click **Save to History** to store the note in the database
 
-#### Option B: Audio Input (New!)
+#### Option B: Multi-Modal Input (New!)
 
-You can provide audio notes in two ways:
+You can provide clinical information in multiple ways:
 
 **Method 1: Record Audio In-App**
 1. Navigate to **Summarize Note** from the sidebar
@@ -235,11 +237,20 @@ You can provide audio notes in two ways:
 
 **Method 2: Upload Audio File**
 1. Navigate to **Summarize Note** from the sidebar
-2. Click the **Upload Audio File** tab
+2. Click the **Upload Audio** tab
 3. Upload a pre-recorded audio file (MP3, WAV, M4A, etc.)
 4. Click **Transcribe Upload** to convert speech to text using Whisper AI
 5. Review and edit the transcribed text if needed
 6. Select a specialty and click **Generate Summary**
+
+**Method 3: Upload Lab Report (OCR)**
+1. Navigate to **Summarize Note** from the sidebar
+2. Click the **Upload Lab Report** tab
+3. Upload a lab report or medical document (PDF, JPG, or PNG)
+4. Preview the document (images show preview, PDFs show file info)
+5. Click **Extract Text (OCR)** to extract text using AI-powered OCR
+6. Review and edit the extracted text if needed
+7. Select a specialty and click **Generate Summary**
 
 ### 2. View Note History
 
@@ -332,7 +343,7 @@ CMD ["streamlit", "run", "app.py", "--server.port=5000", "--server.address=0.0.0
 4. Add billing information (GPT-5 and Whisper require a paid account)
 5. Store the key securely in your environment variables
 
-**Note**: The same API key works for both GPT-5 (text summarization) and Whisper (audio transcription).
+**Note**: The same API key works for GPT-5 (text summarization), Whisper (audio transcription), and Vision (OCR).
 
 ## Development
 
@@ -367,12 +378,13 @@ If you see "Database not available" errors:
 
 ### OpenAI API Errors
 
-If summarization or transcription fails:
+If summarization, transcription, or OCR fails:
 1. Verify your API key is valid and active
 2. Check you have sufficient credits in your OpenAI account
-3. Ensure you have access to GPT-5 and Whisper models
+3. Ensure you have access to GPT-5, Whisper, and GPT-4o (Vision) models
 4. Check network connectivity to OpenAI API
 5. For audio files, ensure they are under 25 MB and in a supported format
+6. For documents, ensure PDFs are under 5 pages and images are clear/readable
 
 ### Audio Transcription Issues
 
@@ -389,6 +401,16 @@ If audio upload doesn't work:
 2. Check the file size is under 25 MB (Whisper API limit)
 3. Verify your OpenAI API key has access to the Whisper model
 4. Try converting the audio to MP3 if using an uncommon format
+
+### Lab Report OCR Issues
+
+If document text extraction doesn't work:
+1. Ensure the document is in a supported format (PDF, JPG, PNG)
+2. Check that the document is clear and readable (not blurry or low-resolution)
+3. For PDFs, limit to 5 pages or less for optimal performance
+4. Verify your OpenAI API key has access to GPT-4o (Vision) model
+5. Try converting handwritten notes to typed documents for better accuracy
+6. Ensure medical terminology is legible in the original document
 
 ### Streamlit Port Already in Use
 
