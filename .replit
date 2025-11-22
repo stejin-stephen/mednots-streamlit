@@ -2,13 +2,14 @@ modules = ["python-3.11"]
 
 [nix]
 channel = "stable-25_05"
+packages = ["freetype", "glibcLocales"]
 
 [deployment]
 deploymentTarget = "autoscale"
 run = ["streamlit", "run", "app.py", "--server.port", "5000"]
 
 [agent]
-integrations = ["python_openai_ai_integrations:1.0.0"]
+integrations = ["python_openai_ai_integrations:1.0.0", "streamlit_database:1.0.0"]
 
 [workflows]
 runButton = "Project"
@@ -39,5 +40,5 @@ localPort = 5000
 externalPort = 80
 
 [[ports]]
-localPort = 38043
+localPort = 37921
 externalPort = 3000
