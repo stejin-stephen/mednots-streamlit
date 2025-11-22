@@ -2,7 +2,7 @@ import streamlit as st
 from utils.database import init_db
 
 st.set_page_config(
-    page_title="Medical Note Summarizer",
+    page_title="Home",
     page_icon="🏥",
     layout="wide"
 )
@@ -41,22 +41,22 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.markdown("#### 📝 Summarize")
     st.markdown("Process clinical notes into structured format")
-    st.page_link("pages/Summarize_Note.py", label="Go to Summarize", icon="📝")
+    st.page_link("pages/1_Summarize_Note.py", label="Go to Summarize", icon="📝")
 
 with col2:
     st.markdown("#### 📚 History")
     st.markdown("View saved notes and search history")
-    st.page_link("pages/Note_History.py", label="Go to History", icon="📚")
+    st.page_link("pages/2_Note_History.py", label="Go to History", icon="📚")
 
 with col3:
     st.markdown("#### 📤 Bulk")
     st.markdown("Process multiple notes at once")
-    st.page_link("pages/Bulk_Processing.py", label="Go to Bulk", icon="📤")
+    st.page_link("pages/3_Bulk_Processing.py", label="Go to Bulk", icon="📤")
 
 with col4:
     st.markdown("#### ⚙️ Settings")
     st.markdown("Configure validation options")
-    st.page_link("pages/Settings.py", label="Go to Settings", icon="⚙️")
+    st.page_link("pages/4_Settings.py", label="Go to Settings", icon="⚙️")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("""
