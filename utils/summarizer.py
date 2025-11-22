@@ -54,7 +54,8 @@ Extract all available information from the note. Use "N/A" or "Not mentioned" fo
             max_completion_tokens=8192
         )
         
-        result = json.loads(response.choices[0].message.content)
+        content = response.choices[0].message.content or "{}"
+        result = json.loads(content)
         return result
         
     except Exception as e:
