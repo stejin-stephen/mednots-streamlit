@@ -122,14 +122,32 @@ with col1:
             list(SPECIALTY_TEMPLATES.keys())
         )
     
-    # Multi-modal input section with tabs for different input types
-    st.markdown("---")
-    st.markdown("**📥 Multi-Modal Input (Optional)**")
-    st.caption("Record audio, upload audio files, or upload lab reports (PDF/images)")
+    # Initialize the clinical note input key if not present
+    if 'clinical_note_input' not in st.session_state:
+        if example_choice != "Custom Note":
+            st.session_state['clinical_note_input'] = EXAMPLE_NOTES[example_choice]
+        else:
+            st.session_state['clinical_note_input'] = ""
+    
+    # Update clinical note input when example is selected (only if not already transcribed)
+    if example_choice != "Custom Note" and not st.session_state.get('transcribed_text'):
+        st.session_state['clinical_note_input'] = EXAMPLE_NOTES[example_choice]
     
     # Initialize transcription state
     if 'transcribed_text' not in st.session_state:
         st.session_state['transcribed_text'] = ""
+    
+    clinical_note = st.text_area(
+        "Enter or review clinical note:",
+        height=400,
+        placeholder="Enter unstructured clinical notes here...\n\nOr use the Multi-Modal Input below to:\n• Record audio\n• Upload audio file\n• Upload lab report (PDF/image) for OCR\n\nExample:\n65-year-old male with chest pain for 2 days...",
+        key="clinical_note_input"
+    )
+    
+    # Multi-modal input section with tabs for different input types
+    st.markdown("---")
+    st.markdown("**📥 Multi-Modal Input (Optional)**")
+    st.caption("Record audio, upload audio files, or upload lab reports (PDF/images)")
     
     # Create tabs for different input types
     audio_tab1, audio_tab2, doc_tab = st.tabs(["🎙️ Record Audio", "📁 Upload Audio", "📄 Upload Lab Report"])
@@ -159,7 +177,7 @@ with col1:
                         # Update the clinical note input session state so it appears in the text area
                         st.session_state['clinical_note_input'] = result["text"]
                         st.session_state['transcribed_text'] = result["text"]
-                        st.success("✅ Recording transcribed successfully! Review the text below.")
+                        st.success("✅ Recording transcribed successfully! Review the text above.")
                         st.rerun()
                     else:
                         st.error(f"❌ Transcription failed: {result.get('error', 'Unknown error')}")
@@ -186,7 +204,7 @@ with col1:
                         # Update the clinical note input session state so it appears in the text area
                         st.session_state['clinical_note_input'] = result["text"]
                         st.session_state['transcribed_text'] = result["text"]
-                        st.success("✅ Audio transcribed successfully! Review the text below.")
+                        st.success("✅ Audio transcribed successfully! Review the text above.")
                         st.rerun()
                     else:
                         st.error(f"❌ Transcription failed: {result.get('error', 'Unknown error')}")
@@ -224,32 +242,14 @@ with col1:
                         
                         # Show pages processed for PDFs
                         if 'pages_processed' in result:
-                            st.success(f"✅ Text extracted successfully from {result['pages_processed']} page(s)! Review below.")
+                            st.success(f"✅ Text extracted successfully from {result['pages_processed']} page(s)! Review above.")
                         else:
-                            st.success("✅ Text extracted successfully! Review below.")
+                            st.success("✅ Text extracted successfully! Review above.")
                         st.rerun()
                     else:
                         st.error(f"❌ Text extraction failed: {result.get('error', 'Unknown error')}")
     
     st.markdown("---")
-    
-    # Initialize the clinical note input key if not present
-    if 'clinical_note_input' not in st.session_state:
-        if example_choice != "Custom Note":
-            st.session_state['clinical_note_input'] = EXAMPLE_NOTES[example_choice]
-        else:
-            st.session_state['clinical_note_input'] = ""
-    
-    # Update clinical note input when example is selected (only if not already transcribed)
-    if example_choice != "Custom Note" and not st.session_state.get('transcribed_text'):
-        st.session_state['clinical_note_input'] = EXAMPLE_NOTES[example_choice]
-    
-    clinical_note = st.text_area(
-        "Enter or review clinical note:",
-        height=400,
-        placeholder="Enter unstructured clinical notes here...\n\nOr use the tabs above to:\n• Record audio\n• Upload audio file\n• Upload lab report (PDF/image) for OCR\n\nExample:\n65-year-old male with chest pain for 2 days...",
-        key="clinical_note_input"
-    )
     
     col_btn1, col_btn2 = st.columns(2)
     with col_btn1:
