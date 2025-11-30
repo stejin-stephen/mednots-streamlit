@@ -100,7 +100,8 @@ pip install \
   fhir-resources>=8.1.0 \
   audio-recorder-streamlit>=0.0.10 \
   pillow>=12.0.0 \
-  pymupdf>=1.26.6
+  pymupdf>=1.26.6 \
+  python-dotenv
 ```
 
 #### Option B: Using uv (faster, modern alternative)

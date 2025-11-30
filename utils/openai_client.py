@@ -4,7 +4,14 @@ import io
 from openai import OpenAI
 from typing import BinaryIO, Union
 from PIL import Image
+from dotenv import load_dotenv
 import fitz
+
+try:    
+    load_dotenv()
+except Exception:
+    # If python-dotenv isn't installed, continue — environment variables
+    pass
 
 AI_INTEGRATIONS_OPENAI_API_KEY = os.environ.get("AI_INTEGRATIONS_OPENAI_API_KEY")
 AI_INTEGRATIONS_OPENAI_BASE_URL = os.environ.get("AI_INTEGRATIONS_OPENAI_BASE_URL")

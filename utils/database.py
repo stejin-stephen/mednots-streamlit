@@ -3,9 +3,19 @@ from datetime import datetime
 from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, JSON
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
 import streamlit as st
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
+# Load environment variables from a .env file when available (optional dependency).
+try:    
+    load_dotenv()
+except Exception:
+    # If python-dotenv isn't installed, continue — environment variables or
+    # Streamlit secrets will be used instead.
+    pass
+
+# Prefer environment variable, fall back to Streamlit secrets if provided.
+DATABASE_URL = os.environ.get("DATABASE_URL") or st.secrets.get("DATABASE_URL")
 
 if DATABASE_URL:
     engine = create_engine(DATABASE_URL, pool_pre_ping=True)

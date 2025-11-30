@@ -128,6 +128,12 @@ SPECIALTY_TEMPLATES = {
 st.title("🏥 Medical Note Summarization")
 st.markdown("Transform unstructured clinical notes into structured SOAP format with key findings")
 
+# Initialize session state variables before any widgets
+if 'pending_text' not in st.session_state:
+    st.session_state['pending_text'] = None
+if 'last_example' not in st.session_state:
+    st.session_state['last_example'] = "Custom Note"
+
 col1, col2 = st.columns([1, 1])
 
 with col1:
@@ -146,27 +152,33 @@ with col1:
             list(SPECIALTY_TEMPLATES.keys())
         )
     
-    # Initialize the clinical note input key if not present
-    if 'clinical_note_input' not in st.session_state:
-        if example_choice != "Custom Note":
-            st.session_state['clinical_note_input'] = EXAMPLE_NOTES[example_choice]
-        else:
-            st.session_state['clinical_note_input'] = ""
+    # Determine the initial value for the text area
+    initial_value = ""
     
-    # Update clinical note input when example is selected (only if not already transcribed)
-    if example_choice != "Custom Note" and not st.session_state.get('transcribed_text'):
-        st.session_state['clinical_note_input'] = EXAMPLE_NOTES[example_choice]
-    
-    # Initialize transcription state
-    if 'transcribed_text' not in st.session_state:
-        st.session_state['transcribed_text'] = ""
+    # Check if there's pending text from transcription/OCR (highest priority)
+    if st.session_state.get('pending_text'):
+        initial_value = st.session_state['pending_text']
+        st.session_state['pending_text'] = None
+    # Check if example changed
+    elif example_choice != "Custom Note" and example_choice != st.session_state.get('last_example'):
+        initial_value = EXAMPLE_NOTES[example_choice]
+        st.session_state['last_example'] = example_choice
+    # Use existing value if available
+    elif 'clinical_note_value' in st.session_state:
+        initial_value = st.session_state['clinical_note_value']
+    elif example_choice != "Custom Note":
+        initial_value = EXAMPLE_NOTES[example_choice]
+        st.session_state['last_example'] = example_choice
     
     clinical_note = st.text_area(
         "Enter or review clinical note:",
+        value=initial_value,
         height=400,
-        placeholder="Enter unstructured clinical notes here...\n\nOr use the Multi-Modal Input below to:\n• Record audio\n• Upload audio file\n• Upload lab report (PDF/image) for OCR\n\nExample:\n65-year-old male with chest pain for 2 days...",
-        key="clinical_note_input"
+        placeholder="Enter unstructured clinical notes here...\n\nOr use the Multi-Modal Input below to:\n• Record audio\n• Upload audio file\n• Upload lab report (PDF/image) for OCR\n\nExample:\n65-year-old male with chest pain for 2 days..."
     )
+    
+    # Store current value for persistence
+    st.session_state['clinical_note_value'] = clinical_note
     
     # Multi-modal input section with tabs for different input types
     st.markdown("---")
@@ -198,9 +210,8 @@ with col1:
                     result = transcribe_audio(audio_io, "recording.wav")
                     
                     if result.get("success"):
-                        # Update the clinical note input session state so it appears in the text area
-                        st.session_state['clinical_note_input'] = result["text"]
-                        st.session_state['transcribed_text'] = result["text"]
+                        # Set pending text to be loaded on next rerun
+                        st.session_state['pending_text'] = result["text"]
                         st.success("✅ Recording transcribed successfully! Review the text above.")
                         st.rerun()
                     else:
@@ -225,9 +236,8 @@ with col1:
                     result = transcribe_audio(audio_bytes_upload, audio_file.name)
                     
                     if result.get("success"):
-                        # Update the clinical note input session state so it appears in the text area
-                        st.session_state['clinical_note_input'] = result["text"]
-                        st.session_state['transcribed_text'] = result["text"]
+                        # Set pending text to be loaded on next rerun
+                        st.session_state['pending_text'] = result["text"]
                         st.success("✅ Audio transcribed successfully! Review the text above.")
                         st.rerun()
                     else:
@@ -260,9 +270,8 @@ with col1:
                     result = process_lab_report(file_bytes, lab_report_file.name)
                     
                     if result.get("success"):
-                        # Update the clinical note input session state so it appears in the text area
-                        st.session_state['clinical_note_input'] = result["text"]
-                        st.session_state['transcribed_text'] = result["text"]
+                        # Set pending text to be loaded on next rerun
+                        st.session_state['pending_text'] = result["text"]
                         
                         # Show pages processed for PDFs
                         if 'pages_processed' in result:
